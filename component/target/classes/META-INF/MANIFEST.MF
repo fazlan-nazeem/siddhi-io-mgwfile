@@ -1,0 +1,66 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1531487194520
+Build-Jdk: 1.8.0_131
+Built-By: fazlann
+Bundle-Contributors: WSO2 Inc
+Bundle-Copyright: WSO2 Inc
+Bundle-Description: WSO2 is an open source application development softw
+ are company focused on providing service-orientedarchitecture solutions
+  for professional developers.
+Bundle-Developers: WSO2 Inc
+Bundle-DocURL: https://docs.wso2.com
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: siddhi-io-mgwfile
+Bundle-SymbolicName: siddhi-io-mgwfile
+Bundle-Vendor: WSO2 Inc
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Export-Package: org.wso2.extension.siddhi.io.mgwfile;uses:="com.zaxxer.h
+ ikari,org.wso2.carbon.databridge.commons,org.wso2.carbon.datasource.cor
+ e.api,org.wso2.extension.siddhi.io.mgwfile.dto,org.wso2.extension.siddh
+ i.io.mgwfile.exception,org.wso2.siddhi.core.stream.input.source";versio
+ n="1.0.0",org.wso2.extension.siddhi.io.mgwfile.dao;uses:="org.wso2.exte
+ nsion.siddhi.io.mgwfile.dto,org.wso2.extension.siddhi.io.mgwfile.except
+ ion";version="1.0.0",org.wso2.extension.siddhi.io.mgwfile.dto;version="
+ 1.0.0",org.wso2.extension.siddhi.io.mgwfile.exception;version="1.0.0",o
+ rg.wso2.extension.siddhi.io.mgwfile.sink;uses:="org.wso2.siddhi.annotat
+ ion,org.wso2.siddhi.core.config,org.wso2.siddhi.core.exception,org.wso2
+ .siddhi.core.stream.output.sink,org.wso2.siddhi.core.util.config,org.ws
+ o2.siddhi.core.util.transport,org.wso2.siddhi.query.api.definition";ver
+ sion="1.0.0",org.wso2.extension.siddhi.io.mgwfile.source;uses:="org.wso
+ 2.siddhi.annotation,org.wso2.siddhi.core.config,org.wso2.siddhi.core.ex
+ ception,org.wso2.siddhi.core.stream.input.source,org.wso2.siddhi.core.u
+ til.config,org.wso2.siddhi.core.util.transport";version="1.0.0",org.wso
+ 2.extension.siddhi.io.mgwfile.task;version="1.0.0"
+Import-Package: com.zaxxer.hikari;resolution:=optional;version="[2.4,3)"
+ ,javax.sql;resolution:=optional,org.apache.commons.io;resolution:=optio
+ nal;version="[1.4,2)",org.apache.commons.lang3;resolution:=optional;ver
+ sion="[3.4,4)",org.apache.commons.logging;resolution:=optional;version=
+ "[1.2,2)",org.apache.log4j;resolution:=optional;version="[1.2,2)",org.j
+ son.simple;resolution:=optional;version="[6.0,7)",org.json.simple.parse
+ r;resolution:=optional;version="[6.0,7)",org.wso2.carbon.databridge.com
+ mons;resolution:=optional;version="[6.0,7)",org.wso2.carbon.datasource.
+ core.api;resolution:=optional;version="[1.1,2)",org.wso2.carbon.datasou
+ rce.core.exception;resolution:=optional;version="[1.1,2)",org.wso2.exte
+ nsion.siddhi.io.mgwfile;resolution:=optional,org.wso2.extension.siddhi.
+ io.mgwfile.dao;resolution:=optional,org.wso2.extension.siddhi.io.mgwfil
+ e.dto;resolution:=optional,org.wso2.extension.siddhi.io.mgwfile.excepti
+ on;resolution:=optional,org.wso2.extension.siddhi.io.mgwfile.task;resol
+ ution:=optional,org.wso2.extension.siddhi.map.wso2event.source;resoluti
+ on:=optional;version="[4.0,5)",org.wso2.siddhi.annotation;resolution:=o
+ ptional;version="[4.1,5)",org.wso2.siddhi.core.config;resolution:=optio
+ nal;version="[4.1,5)",org.wso2.siddhi.core.exception;resolution:=option
+ al;version="[4.1,5)",org.wso2.siddhi.core.stream.input.source;resolutio
+ n:=optional;version="[4.1,5)",org.wso2.siddhi.core.stream.output.sink;r
+ esolution:=optional;version="[4.1,5)",org.wso2.siddhi.core.util.config;
+ resolution:=optional;version="[4.1,5)",org.wso2.siddhi.core.util.transp
+ ort;resolution:=optional;version="[4.1,5)",org.wso2.siddhi.query.api.de
+ finition;resolution:=optional;version="[4.1,5)"
+Require-Capability: osgi.service;filter:="(objectClass=org.wso2.carbon.d
+ atasource.core.api.DataSourceService)";effective:=active;cardinality:=m
+ ultiple,osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+SCM-Revision: 2018-07-13T13:06:22Z
+Service-Component: OSGI-INF/org.wso2.analaytics.apim.MGWFileSourceDS.xml
+Tool: Bnd-3.0.0.201509101326

@@ -1,0 +1,14 @@
+org/wso2/extension/siddhi/io/mgwfile/task/UploadedUsagePublisherExecutorTask.class
+org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceConstants.class
+org/wso2/extension/siddhi/io/mgwfile/sink/MgwFileSink.class
+org/wso2/extension/siddhi/io/mgwfile/FileDataRetrieverUtil.class
+META-INF/annotations/org.wso2.siddhi.annotation.Extension
+org/wso2/extension/siddhi/io/mgwfile/FileEventAdapterDBUtil.class
+org/wso2/extension/siddhi/io/mgwfile/dao/MGWFileSourceDAO.class
+org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceServiceHolder.class
+org/wso2/extension/siddhi/io/mgwfile/dto/UploadedFileInfoDTO.class
+org/wso2/extension/siddhi/io/mgwfile/source/MgwFileSource.class
+org/wso2/extension/siddhi/io/mgwfile/MGWFileDataRetrieverThreadFactory.class
+org/wso2/extension/siddhi/io/mgwfile/FileDataRetriever.class
+org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceDS.class
+org/wso2/extension/siddhi/io/mgwfile/exception/FileBasedAnalyticsException.class

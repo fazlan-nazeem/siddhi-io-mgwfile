@@ -1,0 +1,13 @@
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/source/MgwFileSource.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceDS.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/dao/MGWFileSourceDAO.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceConstants.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/FileDataRetriever.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/FileEventAdapterDBUtil.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/task/UploadedUsagePublisherExecutorTask.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/exception/FileBasedAnalyticsException.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/sink/MgwFileSink.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/FileDataRetrieverUtil.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/MGWFileSourceServiceHolder.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/MGWFileDataRetrieverThreadFactory.java
+/home/fazlann/mgwfile/siddhi-io-mgwfile/component/src/main/java/org/wso2/extension/siddhi/io/mgwfile/dto/UploadedFileInfoDTO.java
