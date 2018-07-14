@@ -24,8 +24,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.extension.siddhi.io.mgwfile.dao.MGWFileSourceDAO;
-import org.wso2.extension.siddhi.io.mgwfile.dto.UploadedFileInfoDTO;
-import org.wso2.extension.siddhi.io.mgwfile.exception.FileBasedAnalyticsException;
+import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
+import org.wso2.extension.siddhi.io.mgwfile.util.FileDataRetrieverUtil;
 import org.wso2.siddhi.core.stream.input.source.SourceEventListener;
 
 import java.io.BufferedReader;
@@ -33,21 +34,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
  * This class publishes events to streams, which are read from the uploaded usage file
  */
-public class FileDataRetriever implements Runnable {
+public class MGWFileDataRetriever implements Runnable {
 
-    private static final Log log = LogFactory.getLog(FileDataRetriever.class);
+    private static final Log log = LogFactory.getLog(MGWFileDataRetriever.class);
 
-    private UploadedFileInfoDTO infoDTO;
+    private MGWFileInfoDTO infoDTO;
 
-    public FileDataRetriever(UploadedFileInfoDTO infoDTO) throws FileBasedAnalyticsException {
+    public MGWFileDataRetriever(MGWFileInfoDTO infoDTO) throws MGWFileSourceException {
         this.infoDTO = infoDTO;
     }
 
@@ -77,7 +78,7 @@ public class FileDataRetriever implements Runnable {
             for (ZipEntry zipEntry; (zipEntry = zipInputStream.getNextEntry()) != null; ) {
                 if (zipEntry.getName().equals(MGWFileSourceConstants.API_USAGE_OUTPUT_FILE_NAME)) {
                     InputStream inputStream = zipInputStream;
-                    inputStreamReader = new InputStreamReader(inputStream);
+                    inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
                     bufferedReader  = new BufferedReader(inputStreamReader);
                     String readLine;
 
@@ -94,7 +95,7 @@ public class FileDataRetriever implements Runnable {
                         //PayloadData
                         String payloadData = elements[4].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
 
-                        SourceEventListener eventSource = MGWFileSourceServiceHolder.
+                        SourceEventListener eventSource = MGWFileSourceRegistrationManager.
                                 getStreamSpecificEventListenerMap().get(streamId);
                         if (eventSource != null) {
                                 try {
@@ -118,7 +119,7 @@ public class FileDataRetriever implements Runnable {
             log.info("Completed publishing API Usage from file : " + infoDTO.toString());
         } catch (IOException e) {
             log.error("Error occurred while reading the API Usage file.", e);
-        } catch (FileBasedAnalyticsException e) {
+        } catch (MGWFileSourceException e) {
             log.error("Error occurred while updating the completion for the processed file.", e);
         } catch (InterruptedException e) {
             //Ignore

@@ -21,30 +21,19 @@ package org.wso2.extension.siddhi.io.mgwfile.dto;
 /**
  * This class represents an uploaded file
  */
-public class UploadedFileInfoDTO {
-    private String tenantDomain;
+public class MGWFileInfoDTO {
     private String fileName;
     private long timeStamp;
 
     /**
      * Constructor
      *
-     * @param tenantDomain tenant domain
      * @param fileName  name of the file
      * @param timeStamp Timestamp of the file creation
      */
-    public UploadedFileInfoDTO(String tenantDomain, String fileName, long timeStamp) {
-        this.tenantDomain = tenantDomain;
+    public MGWFileInfoDTO(String fileName, long timeStamp) {
         this.fileName = fileName;
         this.timeStamp = timeStamp;
-    }
-
-    /**
-     * Get the tenant domain set by a constructor
-     * @return String tenant domain
-     */
-    public String getTenantDomain() {
-        return tenantDomain;
     }
 
     /**
@@ -64,17 +53,9 @@ public class UploadedFileInfoDTO {
         return timeStamp;
     }
 
-    /**
-     * Generates a key based on the composite primary key value
-     *
-     * @return String key
-     */
-    public String getKey() {
-        return tenantDomain + ":" + fileName;
-    }
 
     @Override
     public String toString() {
-        return "[ Tenant : " + tenantDomain + ", FileName : " + fileName + ", TimeStamp : " + timeStamp + "]";
+        return "[ FileName : " + fileName + ", TimeStamp : " + timeStamp + "]";
     }
 }

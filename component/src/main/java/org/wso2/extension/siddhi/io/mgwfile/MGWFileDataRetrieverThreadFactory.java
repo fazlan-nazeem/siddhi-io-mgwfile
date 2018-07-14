@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This is the Thread Factory used to create the threads which reads the files and publish events to DAS
+ * This is the Thread Factory used to create the threads which reads the files from the DB and map them to streams
  */
 public class MGWFileDataRetrieverThreadFactory implements ThreadFactory {
 

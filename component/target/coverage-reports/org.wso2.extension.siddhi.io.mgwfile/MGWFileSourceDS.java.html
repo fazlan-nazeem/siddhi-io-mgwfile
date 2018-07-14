@@ -18,28 +18,51 @@ package org.wso2.extension.siddhi.io.mgwfile;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.jndi.JNDIContextManager;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
-import sun.reflect.generics.reflectiveObjects.LazyReflectiveObjectGenerator;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.naming.Context;
-import javax.naming.NamingException;
+import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 
 @Component(
         name = &quot;org.wso2.analaytics.apim.MGWFileSourceDS&quot;,
         immediate = true
 )
-<span class="nc" id="L39">public class MGWFileSourceDS {</span>
+<span class="nc" id="L36">public class MGWFileSourceDS {</span>
 
-<span class="nc" id="L41">    private static final Log log = LogFactory.getLog(MGWFileSourceDS.class);</span>
+<span class="nc" id="L38">    private static final Log log = LogFactory.getLog(MGWFileSourceDS.class);</span>
 
+    /**
+     * This is the activation method of MGWFileSource service. This will be called when its references are
+     * satisfied. Agent server is initialized here
+     *
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L50">            log.debug(&quot;MGWFileSource Component is started&quot;);</span>
+        }
+<span class="nc" id="L52">    }</span>
+
+    /**
+     * This is the deactivation method of WSO2EventSource service. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L63">            log.debug(&quot;MGWFileSource Component is stopped&quot;);</span>
+        }
+<span class="nc" id="L65">    }</span>
 
     @Reference(
             name = &quot;org.wso2.carbon.datasource.DataSourceService&quot;,
@@ -49,27 +72,17 @@ import javax.naming.NamingException;
             unbind = &quot;unregisterDataSourceService&quot;
     )
     protected void onDataSourceServiceReady(DataSourceService service) {
-<span class="nc" id="L52">        Connection connection = null;</span>
         try {
-<span class="nc" id="L54">            HikariDataSource dsObject = (HikariDataSource) service.getDataSource(&quot;WSO2AM_STATS_DB&quot;);</span>
-<span class="nc" id="L55">            FileEventAdapterDBUtil.setDataSource(dsObject);</span>
-            //From connection do the required CRUD operation
-<span class="nc" id="L57">        } catch (DataSourceException e) {</span>
-<span class="nc" id="L58">            log.error(&quot;error occurred while fetching the data source.&quot;, e);</span>
-        }  finally {
-<span class="nc bnc" id="L60" title="All 6 branches missed.">            if (connection != null) {</span>
-                try {
-<span class="nc" id="L62">                    connection.close();</span>
-<span class="nc" id="L63">                } catch (SQLException e) {</span>
-<span class="nc" id="L64">                    log.error(&quot;error occurred while closing the connection.&quot;, e);</span>
-<span class="nc" id="L65">                }</span>
-            }
-        }
-<span class="nc" id="L68">    }</span>
+<span class="nc" id="L76">            HikariDataSource dsObject = (HikariDataSource) service.getDataSource(&quot;WSO2AM_STATS_DB&quot;);</span>
+<span class="nc" id="L77">            MGWFileSourceDBUtil.setDataSource(dsObject);</span>
+<span class="nc" id="L78">        } catch (DataSourceException e) {</span>
+<span class="nc" id="L79">            log.error(&quot;error occurred while fetching the data source.&quot;, e);</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">    }</span>
 
     protected void unregisterDataSourceService(DataSourceService dataSourceService) {
-<span class="nc" id="L71">        log.info(&quot;Unregistering data sources sample&quot;);</span>
-<span class="nc" id="L72">    }</span>
+<span class="nc" id="L84">        log.info(&quot;Unregistering data sources sample&quot;);</span>
+<span class="nc" id="L85">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

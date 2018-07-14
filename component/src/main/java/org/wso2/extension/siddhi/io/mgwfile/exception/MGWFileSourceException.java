@@ -21,13 +21,13 @@ package org.wso2.extension.siddhi.io.mgwfile.exception;
 /**
  * Exception for Usage Publishing errors
  */
-public class FileBasedAnalyticsException extends Exception {
+public class MGWFileSourceException extends Exception {
 
-    public FileBasedAnalyticsException(String s, Throwable throwable) {
+    public MGWFileSourceException(String s, Throwable throwable) {
         super(s, throwable);
     }
 
-    public FileBasedAnalyticsException(String s) {
+    public MGWFileSourceException(String s) {
         super(s);
     }
 }

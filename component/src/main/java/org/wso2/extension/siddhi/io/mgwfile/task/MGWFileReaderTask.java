@@ -21,12 +21,12 @@ package org.wso2.extension.siddhi.io.mgwfile.task;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.extension.siddhi.io.mgwfile.FileDataRetriever;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileDataRetriever;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileDataRetrieverThreadFactory;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
 import org.wso2.extension.siddhi.io.mgwfile.dao.MGWFileSourceDAO;
-import org.wso2.extension.siddhi.io.mgwfile.dto.UploadedFileInfoDTO;
-import org.wso2.extension.siddhi.io.mgwfile.exception.FileBasedAnalyticsException;
+import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
 
 import java.util.List;
 import java.util.TimerTask;
@@ -36,19 +36,21 @@ import java.util.concurrent.Executors;
 /**
  * Task for scheduling the usage publishing threads
  */
-public class UploadedUsagePublisherExecutorTask extends TimerTask {
+public class MGWFileReaderTask extends TimerTask {
 
     private static final Log log = LogFactory.getLog(
-            UploadedUsagePublisherExecutorTask.class);
-
-    private boolean initialized = false;
+            MGWFileReaderTask.class);
     private static int workerThreadCount = getWorkerThreadCount();
     private static Executor usagePublisherPool = Executors
             .newFixedThreadPool(workerThreadCount, new MGWFileDataRetrieverThreadFactory());
+    private static boolean isPaused = false;
 
-    public UploadedUsagePublisherExecutorTask() {
+    public MGWFileReaderTask() {
         log.info("Initializing Uploaded Usage Publisher Executor Task");
-        this.initialized = true;
+    }
+
+    public static void setPaused(boolean paused) {
+        isPaused = paused;
     }
 
     /**
@@ -76,22 +78,21 @@ public class UploadedUsagePublisherExecutorTask extends TimerTask {
 
     @Override
     public void run() {
-        if (initialized) {
-            try {
-                List<UploadedFileInfoDTO> uploadedFileList = MGWFileSourceDAO
-                        .getNextFilesToProcess(workerThreadCount);
-                for (UploadedFileInfoDTO dto : uploadedFileList) {
-                    //if (log.isDebugEnabled()) {
-                    log.info("Scheduled publishing On-Premise API Usage data for : " + dto.getKey());
-                    //}
-                    Runnable worker = new FileDataRetriever(dto);
+        try {
+            if (!isPaused) {
+                List<MGWFileInfoDTO> uploadedFileList = MGWFileSourceDAO.getNextFilesToProcess(workerThreadCount);
+                for (MGWFileInfoDTO dto : uploadedFileList) {
+                    if (log.isDebugEnabled()) {
+                        log.info("Scheduled publishing micro-gateway API Usage data for : " + dto.getFileName());
+                    }
+                    Runnable worker = new MGWFileDataRetriever(dto);
                     usagePublisherPool.execute(worker);
                 }
-            } catch (FileBasedAnalyticsException e) {
-                log.error("Error occurred while publishing On-Premise API Usage data.", e);
+            } else {
+                log.info("Paused publishing micro-gateway API Usage data ");
             }
-        } else {
-            log.warn("Uploaded Usage Publishing is disabled.");
+        } catch (MGWFileSourceException e) {
+            log.error("Error occurred while publishing micro-gateway API Usage data.", e);
         }
     }
 

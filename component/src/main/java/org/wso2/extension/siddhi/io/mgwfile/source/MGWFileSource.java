@@ -4,11 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.extension.siddhi.io.mgwfile.FileDataRetrieverUtil;
+import org.wso2.extension.siddhi.io.mgwfile.task.MGWFileCleanUpTask;
+import org.wso2.extension.siddhi.io.mgwfile.util.FileDataRetrieverUtil;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
-import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceServiceHolder;
-import org.wso2.extension.siddhi.io.mgwfile.exception.FileBasedAnalyticsException;
-import org.wso2.extension.siddhi.io.mgwfile.task.UploadedUsagePublisherExecutorTask;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceRegistrationManager;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
+import org.wso2.extension.siddhi.io.mgwfile.task.MGWFileReaderTask;
 import org.wso2.extension.siddhi.map.wso2event.source.WSO2SourceMapper;
 import org.wso2.siddhi.annotation.Example;
 import org.wso2.siddhi.annotation.Extension;
@@ -94,8 +95,8 @@ import java.util.TimerTask;
 )
 
 // for more information refer https://wso2.github.io/siddhi/documentation/siddhi-4.0/#sources
-public class MgwFileSource extends Source {
-    private static final Log log = LogFactory.getLog(MgwFileSource.class);
+public class MGWFileSource extends Source {
+    private static final Log log = LogFactory.getLog(MGWFileSource.class);
     private SourceEventListener sourceEventListener;
     private OptionHolder optionHolder;
     private String streamId;
@@ -141,24 +142,24 @@ public class MgwFileSource extends Source {
         streamId = optionHolder.validateAndGetStaticValue("wso2.stream.id", null);
         StreamDefinition streamDefinition = ((WSO2SourceMapper) getMapper()).getWSO2StreamDefinition();
         try {
-            FileDataRetrieverUtil.initStreamDefinitions(streamDefinition, streamId);
-        } catch (FileBasedAnalyticsException e) {
-            e.printStackTrace();
+            FileDataRetrieverUtil.addStreamDefinition(streamDefinition, streamId);
+        } catch (MGWFileSourceException e) {
+            log.error("Error during parsing stream definition ", e);
         }
-        MGWFileSourceServiceHolder.registerEventConsumer(streamId, sourceEventListener);
+        MGWFileSourceRegistrationManager.registerEventConsumer(streamId, sourceEventListener);
         readFileFromDatabase();
     }
 
     private void readFileFromDatabase() {
-        TimerTask usagePublisherTask = new UploadedUsagePublisherExecutorTask();
-        Timer timer = new Timer();
-        String usagePublishFrequency = System
+        TimerTask fileReaderTask = new MGWFileReaderTask();
+        Timer readTimer = new Timer();
+        String fileReaderFrequency = System
                 .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_PUBLISH_FREQUENCY_PROPERTY);
-        if(StringUtils.isEmpty(usagePublishFrequency)) {
+        if (StringUtils.isEmpty(fileReaderFrequency)) {
             log.info("Default usage publishing frequency will be used");
-            usagePublishFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_PUBLISH_FREQUENCY;
+            fileReaderFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_PUBLISH_FREQUENCY;
         }
-        timer.schedule(usagePublisherTask, 1000, Long.parseLong(usagePublishFrequency));
+        readTimer.schedule(fileReaderTask, 1000, Long.parseLong(fileReaderFrequency));
     }
 
     /**
@@ -166,7 +167,7 @@ public class MgwFileSource extends Source {
      */
     @Override
     public void disconnect() {
-
+        MGWFileSourceRegistrationManager.unregisterEventConsumer(streamId);
     }
 
     /**
@@ -174,7 +175,7 @@ public class MgwFileSource extends Source {
      */
     @Override
     public void destroy() {
-        MGWFileSourceServiceHolder.unregisterEventConsumer(streamId, sourceEventListener);
+        MGWFileSourceRegistrationManager.unregisterEventConsumer(streamId);
     }
 
     /**
@@ -182,7 +183,7 @@ public class MgwFileSource extends Source {
      */
     @Override
     public void pause() {
-
+        MGWFileReaderTask.setPaused(true);
     }
 
     /**
@@ -190,7 +191,7 @@ public class MgwFileSource extends Source {
      */
     @Override
     public void resume() {
-
+        MGWFileReaderTask.setPaused(false);
     }
 
     /**

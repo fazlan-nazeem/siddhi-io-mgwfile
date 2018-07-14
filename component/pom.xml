@@ -37,16 +37,6 @@
             <artifactId>testng</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.extension.siddhi.map.xml</groupId>
-            <artifactId>siddhi-map-xml</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.extension.siddhi.map.json</groupId>
-            <artifactId>siddhi-map-json</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
@@ -65,7 +55,6 @@
         <dependency>
             <groupId>org.wso2.extension.siddhi.map.json</groupId>
             <artifactId>siddhi-map-json</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.wso2.extension.siddhi.map.wso2event</groupId>

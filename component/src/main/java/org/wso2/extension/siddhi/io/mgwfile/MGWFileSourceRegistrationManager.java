@@ -18,21 +18,17 @@
 
 package org.wso2.extension.siddhi.io.mgwfile;
 
-import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.siddhi.core.stream.input.source.SourceEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class which manages the Databridge receiver connections
  */
-public class MGWFileSourceServiceHolder {
+public class MGWFileSourceRegistrationManager {
 
     private static Map<String, SourceEventListener> streamSpecificEventListenerMap = new ConcurrentHashMap<>();
-    private static DataSourceService dataSourceService;
 
     static Map<String, SourceEventListener> getStreamSpecificEventListenerMap() {
         return streamSpecificEventListenerMap;
@@ -42,10 +38,8 @@ public class MGWFileSourceServiceHolder {
         streamSpecificEventListenerMap.put(streamId, sourceEventListener);
     }
 
-    public static void unregisterEventConsumer(String streamId, SourceEventListener sourceEventListener) {
-        if (streamId != null) {
+    public static void unregisterEventConsumer(String streamId) {
             streamSpecificEventListenerMap.remove(streamId);
-        }
     }
 
 }

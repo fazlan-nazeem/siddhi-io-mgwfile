@@ -16,21 +16,23 @@
 package org.wso2.extension.siddhi.io.mgwfile;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.jndi.JNDIContextManager;
 import org.wso2.carbon.datasource.core.api.DataSourceService;
 import org.wso2.carbon.datasource.core.exception.DataSourceException;
-import sun.reflect.generics.reflectiveObjects.LazyReflectiveObjectGenerator;
+import org.wso2.extension.siddhi.io.mgwfile.task.MGWFileCleanUpTask;
+import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.naming.Context;
-import javax.naming.NamingException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Component(
         name = "org.wso2.analaytics.apim.MGWFileSourceDS",
@@ -40,6 +42,42 @@ public class MGWFileSourceDS {
 
     private static final Log log = LogFactory.getLog(MGWFileSourceDS.class);
 
+    /**
+     * This is the activation method of MGWFileSource service. This will be called when its references are
+     * satisfied. Agent server is initialized here
+     *
+     * @param bundleContext the bundle context instance of this bundle.
+     * @throws Exception this will be thrown if an issue occurs while executing the activate method
+     */
+    @Activate
+    protected void start(BundleContext bundleContext) throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("MGWFileSource Component is started");
+        }
+
+        TimerTask fileCleanupTask = new MGWFileCleanUpTask();
+        Timer cleanupTimer = new Timer();
+        String fileCleanupFrequency = System
+                .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_CLEANUP_FREQUENCY_PROPERTY);
+        if (StringUtils.isEmpty(fileCleanupFrequency)) {
+            log.info("Default cleanup frequency will be used");
+            fileCleanupFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_CLEANUP_FREQUENCY;
+        }
+        cleanupTimer.schedule(fileCleanupTask, 1000, Long.parseLong(fileCleanupFrequency));
+    }
+
+    /**
+     * This is the deactivation method of WSO2EventSource service. This will be called when this component
+     * is being stopped or references are satisfied during runtime.
+     *
+     * @throws Exception this will be thrown if an issue occurs while executing the de-activate method
+     */
+    @Deactivate
+    protected void stop() throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("MGWFileSource Component is stopped");
+        }
+    }
 
     @Reference(
             name = "org.wso2.carbon.datasource.DataSourceService",
@@ -49,21 +87,11 @@ public class MGWFileSourceDS {
             unbind = "unregisterDataSourceService"
     )
     protected void onDataSourceServiceReady(DataSourceService service) {
-        Connection connection = null;
         try {
             HikariDataSource dsObject = (HikariDataSource) service.getDataSource("WSO2AM_STATS_DB");
-            FileEventAdapterDBUtil.setDataSource(dsObject);
-            //From connection do the required CRUD operation
+            MGWFileSourceDBUtil.setDataSource(dsObject);
         } catch (DataSourceException e) {
             log.error("error occurred while fetching the data source.", e);
-        }  finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    log.error("error occurred while closing the connection.", e);
-                }
-            }
         }
     }
 

@@ -20,10 +20,10 @@ package org.wso2.extension.siddhi.io.mgwfile.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.extension.siddhi.io.mgwfile.FileEventAdapterDBUtil;
+import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
-import org.wso2.extension.siddhi.io.mgwfile.dto.UploadedFileInfoDTO;
-import org.wso2.extension.siddhi.io.mgwfile.exception.FileBasedAnalyticsException;
+import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
 
 import java.io.InputStream;
 import java.sql.Blob;
@@ -46,22 +46,21 @@ public class MGWFileSourceDAO {
     /**
      * Adds a record into the database with uploaded file's information
      *
-     * @param dto   Uploaded File Information represented by {@link UploadedFileInfoDTO}
+     * @param dto   Uploaded File Information represented by {@link MGWFileInfoDTO}
      * @param uploadedInputStream Input stream with the uploaded file content
-     * @throws FileBasedAnalyticsException if there is an error while getting a connection or executing the query
+     * @throws MGWFileSourceException if there is an error while getting a connection or executing the query
      */
-    public static void persistUploadedFile(UploadedFileInfoDTO dto, InputStream uploadedInputStream)
-            throws FileBasedAnalyticsException {
+    public static void persistUploadedFile(MGWFileInfoDTO dto, InputStream uploadedInputStream)
+            throws MGWFileSourceException {
         Connection connection = null;
         boolean autoCommitStatus = false;
         PreparedStatement statement = null;
         try {
-            connection = FileEventAdapterDBUtil.getConnection();
+            connection = MGWFileSourceDBUtil.getConnection();
             autoCommitStatus = connection.getAutoCommit();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(MGWFileSourceConstants.INSERT_UPLOADED_FILE_INFO_QUERY);
-            statement.setString(1, dto.getTenantDomain());
-            statement.setString(2, dto.getFileName());
+            statement.setString(1, dto.getFileName());
             statement.setTimestamp(3, new Timestamp(dto.getTimeStamp()));
             statement.setBinaryStream(4, uploadedInputStream);
             statement.executeUpdate();
@@ -77,15 +76,17 @@ public class MGWFileSourceDAO {
             } catch (SQLException e1) {
                 log.error("Error occurred while rolling back inserting uploaded information into db transaction,", e1);
             }
-            throw new FileBasedAnalyticsException("Error occurred while inserting uploaded information into database",
+            throw new MGWFileSourceException("Error occurred while inserting uploaded information into database",
                     e);
         } finally {
             try {
-                connection.setAutoCommit(autoCommitStatus);
+                if(connection != null) {
+                    connection.setAutoCommit(autoCommitStatus);
+                }
             } catch (SQLException e) {
                 log.warn("Failed to reset auto commit state of database connection to the previous state.", e);
             }
-            FileEventAdapterDBUtil.closeAllConnections(statement, connection, null);
+            MGWFileSourceDBUtil.closeAllConnections(statement, connection, null);
         }
     }
 
@@ -93,18 +94,18 @@ public class MGWFileSourceDAO {
      * Returns the next set of files to bre processed by the worker threads.
      *
      * @param limit number of records to be retrieved
-     * @return list of {@link UploadedFileInfoDTO}
-     * @throws FileBasedAnalyticsException if there is an error while getting a connection or executing the query
+     * @return list of {@link MGWFileInfoDTO}
+     * @throws MGWFileSourceException if there is an error while getting a connection or executing the query
      */
-    public static List<UploadedFileInfoDTO> getNextFilesToProcess(int limit) throws FileBasedAnalyticsException {
+    public static List<MGWFileInfoDTO> getNextFilesToProcess(int limit) throws MGWFileSourceException {
         Connection connection = null;
         PreparedStatement selectStatement = null;
         PreparedStatement updateStatement = null;
         ResultSet resultSet = null;
         boolean autoCommitStatus = false;
-        List<UploadedFileInfoDTO> usageFileList = new ArrayList<>();
+        List<MGWFileInfoDTO> usageFileList = new ArrayList<>();
         try {
-            connection = FileEventAdapterDBUtil.getConnection();
+            connection = MGWFileSourceDBUtil.getConnection();
             autoCommitStatus = connection.getAutoCommit();
             connection.setAutoCommit(false);
             if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
@@ -123,16 +124,14 @@ public class MGWFileSourceDAO {
             selectStatement.setInt(1, limit);
             resultSet = selectStatement.executeQuery();
             while (resultSet.next()) {
-                String tenantDomain = resultSet.getString("TENANT_DOMAIN");
                 String fileName = resultSet.getString("FILE_NAME");
                 long timeStamp = resultSet.getTimestamp("FILE_TIMESTAMP").getTime();
                 updateStatement = connection
                         .prepareStatement(MGWFileSourceConstants.UPDATE_FILE_PROCESSING_STARTED_STATUS);
-                updateStatement.setString(1, tenantDomain);
-                updateStatement.setString(2, fileName);
+                updateStatement.setString(1, fileName);
                 updateStatement.executeUpdate();
                 //File content (Blob) is not stored in memory. Will retrieve one by one when processing.
-                UploadedFileInfoDTO dto = new UploadedFileInfoDTO(tenantDomain, fileName, timeStamp);
+                MGWFileInfoDTO dto = new MGWFileInfoDTO(fileName, timeStamp);
                 usageFileList.add(dto);
                 if (log.isDebugEnabled()) {
                     log.debug("Added File to list : " + dto.toString());
@@ -147,15 +146,17 @@ public class MGWFileSourceDAO {
             } catch (SQLException e1) {
                 log.error("Error occurred while rolling back getting the next files to process transaction.", e1);
             }
-            throw new FileBasedAnalyticsException("Error occurred while getting the next files to process.", e);
+            throw new MGWFileSourceException("Error occurred while getting the next files to process.", e);
         } finally {
             try {
-                connection.setAutoCommit(autoCommitStatus);
+                if(connection != null) {
+                    connection.setAutoCommit(autoCommitStatus);
+                }
             } catch (SQLException e) {
                 log.warn("Failed to reset auto commit state of database connection to the previous state.", e);
             }
-            FileEventAdapterDBUtil.closeStatement(updateStatement);
-            FileEventAdapterDBUtil.closeAllConnections(selectStatement, connection, resultSet);
+            MGWFileSourceDBUtil.closeStatement(updateStatement);
+            MGWFileSourceDBUtil.closeAllConnections(selectStatement, connection, resultSet);
         }
         return usageFileList;
     }
@@ -163,48 +164,46 @@ public class MGWFileSourceDAO {
     /**
      * Updates the completion of processing a uploaded usage file
      *
-     * @param dto Processed file represented by {@link UploadedFileInfoDTO}
-     * @throws FileBasedAnalyticsException if there is an error while getting a connection or executing the query
+     * @param dto Processed file represented by {@link MGWFileInfoDTO}
+     * @throws MGWFileSourceException if there is an error while getting a connection or executing the query
      */
-    public static void updateCompletion(UploadedFileInfoDTO dto) throws FileBasedAnalyticsException {
+    public static void updateCompletion(MGWFileInfoDTO dto) throws MGWFileSourceException {
         Connection connection = null;
         PreparedStatement statement = null;
         try {
-            connection = FileEventAdapterDBUtil.getConnection();
+            connection = MGWFileSourceDBUtil.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(MGWFileSourceConstants.UPDATE_COMPETITION_QUERY);
-            statement.setString(1, dto.getTenantDomain());
-            statement.setString(2, dto.getFileName());
+            statement.setString(1, dto.getFileName());
             statement.executeUpdate();
             connection.commit();
             if (log.isDebugEnabled()) {
                 log.debug("Updated completion for file : " + dto.toString());
             }
         } catch (SQLException e) {
-            throw new FileBasedAnalyticsException("Error occurred while updating the completion state.", e);
+            throw new MGWFileSourceException("Error occurred while updating the completion state.", e);
         } finally {
-            FileEventAdapterDBUtil.closeAllConnections(statement, connection, null);
+            MGWFileSourceDBUtil.closeAllConnections(statement, connection, null);
         }
     }
 
     /**
      * Get the content of the file based on the file information
      *
-     * @param dto Processed file represented by {@link UploadedFileInfoDTO}
+     * @param dto Processed file represented by {@link MGWFileInfoDTO}
      * @return InputStream with the content of the file of null if there is no content
-     * @throws FileBasedAnalyticsException
+     * @throws MGWFileSourceException
      */
-    public static InputStream getFileContent(UploadedFileInfoDTO dto) throws FileBasedAnalyticsException {
+    public static InputStream getFileContent(MGWFileInfoDTO dto) throws MGWFileSourceException {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         InputStream fileContentInputStream = null;
         try {
-            connection = FileEventAdapterDBUtil.getConnection();
+            connection = MGWFileSourceDBUtil.getConnection();
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(MGWFileSourceConstants.GET_UPLOADED_FILE_CONTENT_QUERY);
-            statement.setString(1, dto.getTenantDomain());
-            statement.setString(2, dto.getFileName());
+            statement.setString(1, dto.getFileName());
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 //Postgres bytea data doesn't support getBlob operation
@@ -223,10 +222,10 @@ public class MGWFileSourceDAO {
                 log.debug("Retrieved content of file : " + dto.toString());
             }
         } catch (SQLException e) {
-            throw new FileBasedAnalyticsException(
+            throw new MGWFileSourceException(
                     "Error occurred while retrieving the content of the file: " + dto.toString(), e);
         } finally {
-            FileEventAdapterDBUtil.closeAllConnections(statement, connection, resultSet);
+            MGWFileSourceDBUtil.closeAllConnections(statement, connection, resultSet);
         }
         return fileContentInputStream;
     }
@@ -235,14 +234,14 @@ public class MGWFileSourceDAO {
      * Delete obsolete usage records in the dbG
      *
      * @param lastKeptDate up to which files should be retained
-     * @throws FileBasedAnalyticsException
+     * @throws MGWFileSourceException
      */
-    public static void deleteProcessedOldFiles(Date lastKeptDate) throws FileBasedAnalyticsException {
+    public static void deleteProcessedOldFiles(Date lastKeptDate) throws MGWFileSourceException {
         Connection connection = null;
         PreparedStatement delStatement = null;
         boolean autoCommitStatus = false;
         try {
-            connection = FileEventAdapterDBUtil.getConnection();
+            connection = MGWFileSourceDBUtil.getConnection();
             autoCommitStatus = connection.getAutoCommit();
             connection.setAutoCommit(false);
             delStatement = connection.prepareStatement(MGWFileSourceConstants.DELETE_OLD_UPLOAD_COMPLETED_FILES);
@@ -257,14 +256,16 @@ public class MGWFileSourceDAO {
             } catch (SQLException e1) {
                 log.error("Error occurred while rolling back deleting old uploaded files transaction.", e1);
             }
-            throw new FileBasedAnalyticsException("Error occurred while deleting old uploaded files.", e);
+            throw new MGWFileSourceException("Error occurred while deleting old uploaded files.", e);
         } finally {
             try {
-                connection.setAutoCommit(autoCommitStatus);
+                if(connection != null) {
+                    connection.setAutoCommit(autoCommitStatus);
+                }
             } catch (SQLException e) {
                 log.warn("Failed to reset auto commit state of database connection to the previous state.", e);
             }
-            FileEventAdapterDBUtil.closeAllConnections(delStatement, connection, null);
+            MGWFileSourceDBUtil.closeAllConnections(delStatement, connection, null);
         }
     }
 

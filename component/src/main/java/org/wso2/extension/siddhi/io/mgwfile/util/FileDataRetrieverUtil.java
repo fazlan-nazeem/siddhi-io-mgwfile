@@ -16,33 +16,35 @@
  * under the License.
  */
 
-package org.wso2.extension.siddhi.io.mgwfile;
+package org.wso2.extension.siddhi.io.mgwfile.util;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.extension.siddhi.io.mgwfile.exception.FileBasedAnalyticsException;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Util Class for FileDataRetriever
+ * Util Class for MGWFileDataRetriever
  */
 public class FileDataRetrieverUtil {
 
     private static volatile Map<String, JSONArray> streamDefinitions = new HashMap<>();
 
-    public static void initStreamDefinitions(StreamDefinition streamDefinition, String streamId) throws FileBasedAnalyticsException {
+    public static void addStreamDefinition(StreamDefinition streamDefinition, String streamId) throws
+            MGWFileSourceException {
         try {
             String jsonStr = streamDefinition.toString();
             JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonStr.toString());
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonStr);
             streamDefinitions.put(streamId, (JSONArray) jsonObject.get("payloadData"));
         } catch (ParseException e) {
-            throw new FileBasedAnalyticsException("error");
+            throw new MGWFileSourceException("Error during parsing stream definition", e);
         }
     }
 

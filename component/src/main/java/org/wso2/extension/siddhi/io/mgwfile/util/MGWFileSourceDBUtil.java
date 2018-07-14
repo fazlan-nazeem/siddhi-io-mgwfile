@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.wso2.extension.siddhi.io.mgwfile;
+package org.wso2.extension.siddhi.io.mgwfile.util;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.logging.Log;
@@ -25,13 +25,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
-public class FileEventAdapterDBUtil {
+public class MGWFileSourceDBUtil {
 
-    private static final Log log = LogFactory.getLog(FileEventAdapterDBUtil.class);
+    private static final Log log = LogFactory.getLog(MGWFileSourceDBUtil.class);
 
     private static volatile DataSource dataSource = null;
-    private static final String DATA_SOURCE_NAME = "jdbc/WSO2AM_STATS_DB";
-
 
     /**
      * Utility method to get a new database connection
@@ -106,6 +104,6 @@ public class FileEventAdapterDBUtil {
     }
 
     public static void setDataSource(HikariDataSource dataSource) {
-        FileEventAdapterDBUtil.dataSource = dataSource;
+        MGWFileSourceDBUtil.dataSource = dataSource;
     }
 }

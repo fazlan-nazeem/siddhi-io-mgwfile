@@ -43,8 +43,6 @@ From: 'an unknown organization'
 
   - WSO2 Carbon - Orbit - LMAX Disruptor (http://wso2.org) org.wso2.orbit.com.lmax:disruptor:bundle:3.3.2.wso2v2
 
-  - WSO2 Carbon Orbit - Tapestry JSON (http://wso2.org) org.wso2.orbit.org.apache.tapestry:tapestry-json:bundle:5.4.1.wso2v1
-
   - SnakeYAML  org.wso2.orbit.org.yaml:snakeyaml:bundle:1.16.0.wso2v1
 
   - SnakeYAML (http://www.snakeyaml.org) org.yaml:snakeyaml:bundle:1.17
@@ -63,21 +61,13 @@ From: 'Atteo' (http://www.atteo.com)
     License: Apache License, Version 2.0 
 
 From: 'Chemouni Uriel' (http://www.minidev.net/)
-  - ASM helper Minidev (http://asm/) net.minidev:asm:bundle:1.0.2
+  - ASM based accessors helper used by json-smart (http://accessors-smart/) net.minidev:accessors-smart:bundle:1.1
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
   - JSON Small and Fast Parser (http://json-smart/) net.minidev:json-smart:bundle:2.1.0
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-From: 'FasterXML' (http://fasterxml.com/)
-  - Jackson-annotations (http://github.com/FasterXML/jackson) com.fasterxml.jackson.core:jackson-annotations:bundle:2.7.0
-    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-  - Jackson-core (https://github.com/FasterXML/jackson-core) com.fasterxml.jackson.core:jackson-core:bundle:2.7.4
-    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-  - jackson-databind (http://github.com/FasterXML/jackson) com.fasterxml.jackson.core:jackson-databind:bundle:2.7.4
-    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-
 From: 'ObjectWeb' (http://www.objectweb.org/)
-  - ASM Core (http://asm.objectweb.org/asm/) asm:asm:jar:3.3.1
+  - ASM Core (http://asm.objectweb.org/asm/) org.ow2.asm:asm:jar:5.0.3
     License: BSD  (http://asm.objectweb.org/license.html)
 
 From: 'OpenFeign' (https://github.com/openfeign)
@@ -128,8 +118,6 @@ From: 'WSO2' (http://www.wso2.org/)
   - WSO2 Carbon Secure Vault - Component (http://wso2.com) org.wso2.carbon.secvault:org.wso2.carbon.secvault:bundle:5.0.10
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
   - WSO2 Carbon - Utils (http://wso2.com) org.wso2.carbon.utils:org.wso2.carbon.utils:bundle:2.0.2
-    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
-  - Siddhi Extension - JSON Mapper (http://www.wso2.org/siddhi-map-json-parent/siddhi-map-json/) org.wso2.extension.siddhi.map.json:siddhi-map-json:bundle:4.0.15
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
   - Siddhi Extension - WSO2 Event Sink and Source Mapper (http://www.wso2.org/siddhi-map-wso2event-parent/siddhi-map-wso2event/) org.wso2.extension.siddhi.map.wso2event:siddhi-map-wso2event:bundle:4.0.11
     License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)

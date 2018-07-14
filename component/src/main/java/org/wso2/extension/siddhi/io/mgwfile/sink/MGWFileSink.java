@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MgwFileSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Siddhi io mgwfile extension</a> &gt; <a href="index.source.html" class="el_package">org.wso2.extension.siddhi.io.mgwfile.sink</a> &gt; <span class="el_source">MgwFileSink.java</span></div><h1>MgwFileSink.java</h1><pre class="source lang-java linenums">package org.wso2.extension.siddhi.io.mgwfile.sink;
+package org.wso2.extension.siddhi.io.mgwfile.sink;
 
 import org.apache.log4j.Logger;
 import org.wso2.siddhi.annotation.Example;
@@ -19,51 +19,51 @@ import java.util.Map;
 
 /**
  * Annotation of Siddhi Extension.
- * &lt;pre&gt;&lt;code&gt;
+ * <pre><code>
  * eg:-
  * {@literal @}Extension(
- * name = &quot;The name of the extension&quot;,
- * namespace = &quot;The namespace of the extension&quot;,
- * description = &quot;The description of the extension (optional).&quot;,
+ * name = "The name of the extension",
+ * namespace = "The namespace of the extension",
+ * description = "The description of the extension (optional).",
  * //Sink configurations
  * parameters = {
- * {@literal @}Parameter(name = &quot;The name of the first parameter&quot;, type = &quot;Supprted parameter types.
+ * {@literal @}Parameter(name = "The name of the first parameter", type = "Supprted parameter types.
  *                              eg:{DataType.STRING,DataType.INT, DataType.LONG etc},dynamic=false ,optinal=true/false ,
- *                              if optional =true then assign default value according the type&quot;)
+ *                              if optional =true then assign default value according the type")
  *   System parameter is used to define common extension wide
  *              },
  * examples = {
- * {@literal @}Example({&quot;Example of the first CustomExtension contain syntax and description.Here,
+ * {@literal @}Example({"Example of the first CustomExtension contain syntax and description.Here,
  *                      Syntax describe default mapping for SourceMapper and description describes
  *                      the output of according this syntax},
  *                      }
- * &lt;/code&gt;&lt;/pre&gt;
+ * </code></pre>
  */
 
 @Extension(
-        name = &quot;mgwfile&quot;,
-        namespace = &quot;sink&quot;,
-        description = &quot; &quot;,
+        name = "mgwfile",
+        namespace = "sink",
+        description = " ",
         parameters = {
-                /*@Parameter(name = &quot; &quot;,
-                        description = &quot; &quot; ,
+                /*@Parameter(name = " ",
+                        description = " " ,
                         dynamic = false/true,
-                        optional = true/false, defaultValue = &quot; &quot;,
+                        optional = true/false, defaultValue = " ",
                         type = {DataType.INT, DataType.BOOL, DataType.STRING, DataType.DOUBLE,etc }),
                         type = {DataType.INT, DataType.BOOL, DataType.STRING, DataType.DOUBLE, }),*/
         },
         examples = {
                 @Example(
-                        syntax = &quot; &quot;,
-                        description = &quot; &quot;
+                        syntax = " ",
+                        description = " "
                 )
         }
 )
 
 // for more information refer https://wso2.github.io/siddhi/documentation/siddhi-4.0/#sinks
 
-<span class="nc" id="L65">public class MgwFileSink extends Sink {</span>
-<span class="nc" id="L66">    private static final Logger log = Logger.getLogger(MgwFileSink.class);</span>
+public class MGWFileSink extends Sink {
+    private static final Logger log = Logger.getLogger(MGWFileSink.class);
 
     /**
      * Returns the list of classes which this sink can consume.
@@ -74,7 +74,7 @@ import java.util.Map;
      */
     @Override
     public Class[] getSupportedInputEventClasses() {
-<span class="nc" id="L77">            return new Class[0];</span>
+            return new Class[0];
     }
 
     /**
@@ -85,7 +85,7 @@ import java.util.Map;
      */
     @Override
     public String[] getSupportedDynamicOptions() {
-<span class="nc" id="L88">            return new String[0];</span>
+            return new String[0];
     }
 
     /**
@@ -102,7 +102,7 @@ import java.util.Map;
     protected void init(StreamDefinition streamDefinition, OptionHolder optionHolder, ConfigReader configReader,
             SiddhiAppContext siddhiAppContext) {
 
-<span class="nc" id="L105">    }</span>
+    }
 
     /**
      * This method will be called when events need to be published via this sink
@@ -114,7 +114,7 @@ import java.util.Map;
     @Override
     public void publish(Object payload, DynamicOptions dynamicOptions) throws ConnectionUnavailableException {
 
-<span class="nc" id="L117">    }</span>
+    }
 
     /**
      * This method will be called before the processing method.
@@ -125,7 +125,7 @@ import java.util.Map;
     @Override
     public void connect() throws ConnectionUnavailableException {
 
-<span class="nc" id="L128">    }</span>
+    }
 
     /**
      * Called after all publishing is done, or when {@link ConnectionUnavailableException} is thrown
@@ -134,7 +134,7 @@ import java.util.Map;
     @Override
     public void disconnect() {
 
-<span class="nc" id="L137">    }</span>
+    }
 
     /**
      * The method can be called when removing an event receiver.
@@ -143,7 +143,7 @@ import java.util.Map;
     @Override
     public void destroy() {
 
-<span class="nc" id="L146">    }</span>
+    }
 
     /**
      * Used to collect the serializable state of the processing element, that need to be
@@ -152,8 +152,8 @@ import java.util.Map;
      * @return all internal states should be return as an map with meaning full keys
      */
     @Override
-    public Map&lt;String, Object&gt; currentState() {
-<span class="nc" id="L156">            return null;</span>
+    public Map<String, Object> currentState() {
+            return null;
     }
 
     /**
@@ -164,9 +164,8 @@ import java.util.Map;
      *              This map will have the  same keys that is created upon calling currentState() method.
      */
     @Override
-    public void restoreState(Map&lt;String, Object&gt; map) {
+    public void restoreState(Map<String, Object> map) {
 
-<span class="nc" id="L169">    }</span>
+    }
 }
 
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
