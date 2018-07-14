@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileDataRetrieverUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Siddhi io mgwfile extension</a> &gt; <a href="index.source.html" class="el_package">org.wso2.extension.siddhi.io.mgwfile.util</a> &gt; <span class="el_source">FileDataRetrieverUtil.java</span></div><h1>FileDataRetrieverUtil.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2018 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the &quot;License&quot;); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.extension.siddhi.io.mgwfile.util;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
+import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Util Class for MGWFileDataRetriever
+ */
+<span class="nc" id="L35">public class FileDataRetrieverUtil {</span>
+
+<span class="nc" id="L37">    private static volatile Map&lt;String, JSONArray&gt; streamDefinitions = new HashMap&lt;&gt;();</span>
+
+    public static void addStreamDefinition(StreamDefinition streamDefinition, String streamId) throws
+            MGWFileSourceException {
+        try {
+<span class="nc" id="L42">            String jsonStr = streamDefinition.toString();</span>
+<span class="nc" id="L43">            JSONParser jsonParser = new JSONParser();</span>
+<span class="nc" id="L44">            JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonStr);</span>
+<span class="nc" id="L45">            streamDefinitions.put(streamId, (JSONArray) jsonObject.get(&quot;payloadData&quot;));</span>
+<span class="nc" id="L46">        } catch (ParseException e) {</span>
+<span class="nc" id="L47">            throw new MGWFileSourceException(&quot;Error during parsing stream definition&quot;, e);</span>
+<span class="nc" id="L48">        }</span>
+<span class="nc" id="L49">    }</span>
+
+
+    public static Object createMetaData(String str) throws Exception {
+<span class="nc bnc" id="L53" title="All 4 branches missed.">        if (str.isEmpty() || &quot;null&quot;.equals(str)) {</span>
+<span class="nc" id="L54">            return null;</span>
+        }
+<span class="nc" id="L56">        return new Object[]{str};</span>
+    }
+
+    public static Object[] createPayload(String streamId, String str) throws Exception {
+
+<span class="nc" id="L61">        JSONArray jsonArray = streamDefinitions.get(streamId);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (jsonArray != null) {</span>
+<span class="nc" id="L63">            String[] strings = str.split(MGWFileSourceConstants.OBJECT_SEPARATOR);</span>
+<span class="nc" id="L64">            Object[] objects = new Object[strings.length];</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            for (int i = 0; i &lt; strings.length; i++) {</span>
+<span class="nc" id="L66">                JSONObject obj = (JSONObject) jsonArray.get(i);</span>
+<span class="nc" id="L67">                objects[i] = getPayloadObject((String) obj.get(&quot;type&quot;), strings[i].trim());</span>
+            }
+<span class="nc" id="L69">            return objects;</span>
+        }
+<span class="nc" id="L71">        return new Object[0];</span>
+    }
+
+    public static Object getPayloadObject(String type, String string) throws Exception {
+<span class="nc bnc" id="L75" title="All 4 branches missed.">        if (string == null || string.isEmpty()) {</span>
+<span class="nc" id="L76">            return null;</span>
+        }
+<span class="nc bnc" id="L78" title="All 18 branches missed.">        switch (type) {</span>
+            case &quot;STRING&quot;:
+<span class="nc" id="L80">                return string;</span>
+            case &quot;INT&quot;:
+<span class="nc" id="L82">                return Integer.parseInt(string);</span>
+            case &quot;LONG&quot;:
+<span class="nc" id="L84">                return Long.parseLong(string);</span>
+            case &quot;BOOL&quot;:
+<span class="nc" id="L86">                return Boolean.parseBoolean(string);</span>
+            default:
+<span class="nc" id="L88">                return string;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>
