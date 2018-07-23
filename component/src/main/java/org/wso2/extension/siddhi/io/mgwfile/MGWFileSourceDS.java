@@ -34,6 +34,10 @@ import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
+/**
+ * This is the activation and deactivation class for MGWFile osgi component
+ */
 @Component(
         name = "org.wso2.analaytics.apim.MGWFileSourceDS",
         immediate = true

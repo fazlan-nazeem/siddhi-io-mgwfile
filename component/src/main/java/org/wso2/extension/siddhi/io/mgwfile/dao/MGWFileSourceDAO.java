@@ -20,10 +20,10 @@ package org.wso2.extension.siddhi.io.mgwfile.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
 import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
 import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
+import org.wso2.extension.siddhi.io.mgwfile.util.MGWFileSourceDBUtil;
 
 import java.io.InputStream;
 import java.sql.Blob;
@@ -46,7 +46,7 @@ public class MGWFileSourceDAO {
     /**
      * Adds a record into the database with uploaded file's information
      *
-     * @param dto   Uploaded File Information represented by {@link MGWFileInfoDTO}
+     * @param dto                 Uploaded File Information represented by {@link MGWFileInfoDTO}
      * @param uploadedInputStream Input stream with the uploaded file content
      * @throws MGWFileSourceException if there is an error while getting a connection or executing the query
      */
@@ -76,11 +76,10 @@ public class MGWFileSourceDAO {
             } catch (SQLException e1) {
                 log.error("Error occurred while rolling back inserting uploaded information into db transaction,", e1);
             }
-            throw new MGWFileSourceException("Error occurred while inserting uploaded information into database",
-                    e);
+            throw new MGWFileSourceException("Error occurred while inserting uploaded information into database", e);
         } finally {
             try {
-                if(connection != null) {
+                if (connection != null) {
                     connection.setAutoCommit(autoCommitStatus);
                 }
             } catch (SQLException e) {
@@ -149,7 +148,7 @@ public class MGWFileSourceDAO {
             throw new MGWFileSourceException("Error occurred while getting the next files to process.", e);
         } finally {
             try {
-                if(connection != null) {
+                if (connection != null) {
                     connection.setAutoCommit(autoCommitStatus);
                 }
             } catch (SQLException e) {
@@ -208,8 +207,7 @@ public class MGWFileSourceDAO {
             while (resultSet.next()) {
                 //Postgres bytea data doesn't support getBlob operation
                 if (connection.getMetaData().getDriverName().contains("PostgreSQL")) {
-                    fileContentInputStream = resultSet
-                            .getBinaryStream(MGWFileSourceConstants.API_USAGE_FILE_CONTENT);
+                    fileContentInputStream = resultSet.getBinaryStream(MGWFileSourceConstants.API_USAGE_FILE_CONTENT);
                 } else {
                     Blob content = resultSet.getBlob(MGWFileSourceConstants.API_USAGE_FILE_CONTENT);
                     fileContentInputStream = content.getBinaryStream();
@@ -259,7 +257,7 @@ public class MGWFileSourceDAO {
             throw new MGWFileSourceException("Error occurred while deleting old uploaded files.", e);
         } finally {
             try {
-                if(connection != null) {
+                if (connection != null) {
                     connection.setAutoCommit(autoCommitStatus);
                 }
             } catch (SQLException e) {

@@ -15,6 +15,9 @@
 */
 package org.wso2.extension.siddhi.io.mgwfile;
 
+/**
+ *  MGWFile EventSource specific constatnts class
+ */
 public class MGWFileSourceConstants {
 
     public static final String API_USAGE_FILE_CONTENT = "FILE_CONTENT";

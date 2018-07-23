@@ -25,6 +25,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
+/**
+ *  Util class for DAO layer
+ */
 public class MGWFileSourceDBUtil {
 
     private static final Log log = LogFactory.getLog(MGWFileSourceDBUtil.class);

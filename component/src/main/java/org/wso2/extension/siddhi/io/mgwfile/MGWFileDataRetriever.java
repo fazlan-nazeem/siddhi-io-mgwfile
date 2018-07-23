@@ -60,7 +60,6 @@ public class MGWFileDataRetriever implements Runnable {
 
     private void publishEvents() {
 
-        FileInputStream fileInputStream = null;
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
         InputStream fileContentStream = null;
@@ -111,9 +110,6 @@ public class MGWFileDataRetriever implements Runnable {
                     }
                 }
             }
-            //There is no way to check the current size of the queue, hence wait 30 seconds in order to get the
-            //data publisher queue cleaned up
-            Thread.sleep(30000);
             //Update the database
             MGWFileSourceDAO.updateCompletion(infoDTO);
             log.info("Completed publishing API Usage from file : " + infoDTO.toString());
@@ -121,10 +117,7 @@ public class MGWFileDataRetriever implements Runnable {
             log.error("Error occurred while reading the API Usage file.", e);
         } catch (MGWFileSourceException e) {
             log.error("Error occurred while updating the completion for the processed file.", e);
-        } catch (InterruptedException e) {
-            //Ignore
         } finally {
-            IOUtils.closeQuietly(fileInputStream);
             IOUtils.closeQuietly(inputStreamReader);
             IOUtils.closeQuietly(bufferedReader);
             IOUtils.closeQuietly(fileContentStream);
