@@ -28,7 +28,9 @@ public class MGWFileSourceConstants {
 
     public static final String UPLOADED_USAGE_CLEANUP_FREQUENCY_PROPERTY = "usage.cleanup.frequency";
 
-    public static final String FILE_RETENTION_DAYS = "file.retention.days";
+    public static final String FILE_RETENTION_DAYS_PROPERTY = "file.retention.days";
+
+    public static final String DEFAULT_FILE_RETENTION_DAYS = "5";
 
     public static final String WORKER_THREAD_COUNT_PROPERTY = "usage.publishing.thread.count";
 
@@ -59,21 +61,21 @@ public class MGWFileSourceConstants {
             + "SET FILE_PROCESSED=1 WHERE FILE_PROCESSED=0 AND FILE_NAME = ?";
 
     public static final String DELETE_OLD_UPLOAD_COMPLETED_FILES = "DELETE FROM AM_USAGE_UPLOADED_FILES "
-            + "WHERE (FILE_PROCESSED=1 OR FILE_PROCESSED=2) AND FILE_TIMESTAMP < ?";
+            + "WHERE FILE_PROCESSED=2 AND FILE_TIMESTAMP < ?";
 
     public static final String GET_UPLOADED_FILE_CONTENT_QUERY = "SELECT FILE_CONTENT "
             + "FROM AM_USAGE_UPLOADED_FILES WHERE FILE_NAME=?";
 
     public static final String UPDATE_COMPETITION_QUERY = "UPDATE AM_USAGE_UPLOADED_FILES "
-            + "SET FILE_PROCESSED=2,FILE_CONTENT=NULL WHERE FILE_NAME=?";
+            + "SET FILE_PROCESSED=2 WHERE FILE_NAME=?";
 
-    public static final int DEFAULT_WORKER_THREAD_COUNT = 3;
+    public static final String DEFAULT_WORKER_THREAD_COUNT = "3";
 
     // Separators used for persisting events
-    public static final String EVENT_SEPARATOR = "--EVT--";
+    public static final String EVENT_SEPARATOR = "-ES-";
 
-    public static final String KEY_VALUE_SEPARATOR = "--KVS--";
+    public static final String KEY_VALUE_SEPARATOR = "-KS-";
 
-    public static final String OBJECT_SEPARATOR = "--OBJ--";
+    public static final String OBJECT_SEPARATOR = "-OS-";
 
 }

@@ -1,10 +1,9 @@
 package org.wso2.extension.siddhi.io.mgwfile.source;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceDS;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceRegistrationManager;
 import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
 import org.wso2.extension.siddhi.io.mgwfile.task.MGWFileReaderTask;
@@ -21,7 +20,6 @@ import org.wso2.siddhi.core.util.transport.OptionHolder;
 
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This is a sample class-level comment, explaining what the extension class does.
@@ -99,6 +97,7 @@ public class MGWFileSource extends Source {
     private SourceEventListener sourceEventListener;
     private OptionHolder optionHolder;
     private String streamId;
+    private MGWFileReaderTask fileReaderTask;
 
     /**
      * The initialization method for {@link Source}, will be called before other methods. It used to validate
@@ -116,6 +115,7 @@ public class MGWFileSource extends Source {
                      SiddhiAppContext siddhiAppContext) {
         this.sourceEventListener = sourceEventListener;
         this.optionHolder = optionHolder;
+        streamId = optionHolder.validateAndGetStaticValue("wso2.stream.id", null);
     }
 
     /**
@@ -138,27 +138,21 @@ public class MGWFileSource extends Source {
      */
     @Override
     public void connect(ConnectionCallback connectionCallback) throws ConnectionUnavailableException {
-        streamId = optionHolder.validateAndGetStaticValue("wso2.stream.id", null);
         StreamDefinition streamDefinition = ((WSO2SourceMapper) getMapper()).getWSO2StreamDefinition();
         try {
             FileDataRetrieverUtil.addStreamDefinition(streamDefinition, streamId);
+            MGWFileSourceRegistrationManager.registerEventConsumer(streamId, sourceEventListener);
+            readFileFromDatabase();
         } catch (MGWFileSourceException e) {
-            log.error("Error during parsing stream definition ", e);
+            log.error("Error during parsing stream definition for stream " + streamId
+                    + " TimerTask will not be scheduled", e);
         }
-        MGWFileSourceRegistrationManager.registerEventConsumer(streamId, sourceEventListener);
-        readFileFromDatabase();
     }
 
     private void readFileFromDatabase() {
-        TimerTask fileReaderTask = new MGWFileReaderTask();
+        fileReaderTask = new MGWFileReaderTask();
         Timer readTimer = new Timer();
-        String fileReaderFrequency = System
-                .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_PUBLISH_FREQUENCY_PROPERTY);
-        if (StringUtils.isEmpty(fileReaderFrequency)) {
-            log.info("Default usage publishing frequency will be used");
-            fileReaderFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_PUBLISH_FREQUENCY;
-        }
-        readTimer.schedule(fileReaderTask, 1000, Long.parseLong(fileReaderFrequency));
+        readTimer.schedule(fileReaderTask, 0, Long.parseLong(MGWFileSourceDS.getFileReaderFrequency()));
     }
 
     /**
@@ -182,7 +176,7 @@ public class MGWFileSource extends Source {
      */
     @Override
     public void pause() {
-        MGWFileReaderTask.setPaused(true);
+        fileReaderTask.setPaused(true);
     }
 
     /**
@@ -190,7 +184,7 @@ public class MGWFileSource extends Source {
      */
     @Override
     public void resume() {
-        MGWFileReaderTask.setPaused(false);
+        fileReaderTask.setPaused(false);
     }
 
     /**

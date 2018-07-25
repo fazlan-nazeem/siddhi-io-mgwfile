@@ -45,6 +45,10 @@ import java.util.TimerTask;
 public class MGWFileSourceDS {
 
     private static final Log log = LogFactory.getLog(MGWFileSourceDS.class);
+    private static String fileReaderFrequency;
+    private static String fileRetentionDays;
+    private static String fileCleanupFrequency;
+    private static String workerThreadCount;
 
     /**
      * This is the activation method of MGWFileSource service. This will be called when its references are
@@ -58,15 +62,9 @@ public class MGWFileSourceDS {
         if (log.isDebugEnabled()) {
             log.debug("MGWFileSource Component is started");
         }
-
+        initializeSystemProperties();
         TimerTask fileCleanupTask = new MGWFileCleanUpTask();
         Timer cleanupTimer = new Timer();
-        String fileCleanupFrequency = System
-                .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_CLEANUP_FREQUENCY_PROPERTY);
-        if (StringUtils.isEmpty(fileCleanupFrequency)) {
-            log.info("Default cleanup frequency will be used");
-            fileCleanupFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_CLEANUP_FREQUENCY;
-        }
         cleanupTimer.schedule(fileCleanupTask, 1000, Long.parseLong(fileCleanupFrequency));
     }
 
@@ -81,6 +79,49 @@ public class MGWFileSourceDS {
         if (log.isDebugEnabled()) {
             log.debug("MGWFileSource Component is stopped");
         }
+    }
+
+    private void initializeSystemProperties() {
+        //initilize fileReaderFrequency
+        fileReaderFrequency = System
+                .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_PUBLISH_FREQUENCY_PROPERTY);
+        if (StringUtils.isEmpty(fileReaderFrequency)) {
+            log.debug("Default usage publishing frequency will be used");
+            fileReaderFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_PUBLISH_FREQUENCY;
+        }
+        //initilize fileCleanupFrequency
+        fileCleanupFrequency = System
+                .getProperty(MGWFileSourceConstants.UPLOADED_USAGE_CLEANUP_FREQUENCY_PROPERTY);
+        if (StringUtils.isEmpty(fileCleanupFrequency)) {
+            log.debug("Default cleanup frequency will be used");
+            fileCleanupFrequency = MGWFileSourceConstants.DEFAULT_UPLOADED_USAGE_CLEANUP_FREQUENCY;
+        }
+        //initialize fileRetentionDays
+        fileRetentionDays = System.getProperty(MGWFileSourceConstants.FILE_RETENTION_DAYS_PROPERTY);
+        if (StringUtils.isEmpty(fileRetentionDays)) {
+            log.debug("Default file retention days will be used");
+            fileRetentionDays = MGWFileSourceConstants.DEFAULT_FILE_RETENTION_DAYS;
+        }
+
+        //initialize workerThreadCount
+        workerThreadCount = System
+                .getProperty(MGWFileSourceConstants.WORKER_THREAD_COUNT_PROPERTY);
+        if (StringUtils.isEmpty(workerThreadCount)) {
+            log.debug("Default worker thread count will be used");
+            workerThreadCount = MGWFileSourceConstants.DEFAULT_WORKER_THREAD_COUNT;
+        }
+    }
+
+    public static String getFileReaderFrequency() {
+        return fileReaderFrequency;
+    }
+
+    public static String getFileRetentionDays() {
+        return fileRetentionDays;
+    }
+
+    public static String getWorkerThreadCount() {
+        return workerThreadCount;
     }
 
     @Reference(

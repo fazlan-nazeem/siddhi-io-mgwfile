@@ -18,12 +18,11 @@
 
 package org.wso2.extension.siddhi.io.mgwfile.task;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileDataRetriever;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileDataRetrieverThreadFactory;
-import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceDS;
 import org.wso2.extension.siddhi.io.mgwfile.dao.MGWFileSourceDAO;
 import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
 import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
@@ -40,40 +39,17 @@ public class MGWFileReaderTask extends TimerTask {
 
     private static final Log log = LogFactory.getLog(
             MGWFileReaderTask.class);
-    private static int workerThreadCount = getWorkerThreadCount();
+    private static int workerThreadCount = Integer.parseInt(MGWFileSourceDS.getWorkerThreadCount());
     private static Executor usagePublisherPool = Executors
-            .newFixedThreadPool(workerThreadCount, new MGWFileDataRetrieverThreadFactory());
-    private static boolean isPaused = false;
+            .newFixedThreadPool(workerThreadCount, new MGWFileDataRetrieverThreadFactory("mgwfile-thread"));
+    private boolean isPaused = false;
 
     public MGWFileReaderTask() {
-        log.info("Initializing Uploaded Usage Publisher Executor Task");
+        log.debug("Initializing Uploaded Usage Publisher Executor Task");
     }
 
-    public static void setPaused(boolean paused) {
+    public void setPaused(boolean paused) {
         isPaused = paused;
-    }
-
-    /**
-     * Returns the number of workers allowed for the server.
-     *
-     * @return int number of worker threads
-     */
-    private static int getWorkerThreadCount() {
-
-        int threadCount = MGWFileSourceConstants.DEFAULT_WORKER_THREAD_COUNT;
-        String workerThreadCountSystemPropertyValue = System
-                .getProperty(MGWFileSourceConstants.WORKER_THREAD_COUNT_PROPERTY);
-        if (StringUtils.isNotEmpty(workerThreadCountSystemPropertyValue)) {
-            try {
-                threadCount = Integer.parseInt(workerThreadCountSystemPropertyValue);
-            } catch (NumberFormatException e) {
-                log.error("Error while parsing the system property: "
-                        + MGWFileSourceConstants.WORKER_THREAD_COUNT_PROPERTY
-                        + " to integer. Using default usage publish worker thread count: "
-                        + MGWFileSourceConstants.DEFAULT_WORKER_THREAD_COUNT, e);
-            }
-        }
-        return threadCount;
     }
 
     @Override

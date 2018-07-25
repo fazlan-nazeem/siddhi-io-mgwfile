@@ -21,7 +21,6 @@ package org.wso2.extension.siddhi.io.mgwfile;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.extension.siddhi.io.mgwfile.dao.MGWFileSourceDAO;
 import org.wso2.extension.siddhi.io.mgwfile.dto.MGWFileInfoDTO;
@@ -30,7 +29,6 @@ import org.wso2.extension.siddhi.io.mgwfile.util.FileDataRetrieverUtil;
 import org.wso2.siddhi.core.stream.input.source.SourceEventListener;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,39 +72,49 @@ public class MGWFileDataRetriever implements Runnable {
                 return;
             }
             zipInputStream = new ZipInputStream(fileContentStream);
-            for (ZipEntry zipEntry; (zipEntry = zipInputStream.getNextEntry()) != null; ) {
-                if (zipEntry.getName().equals(MGWFileSourceConstants.API_USAGE_OUTPUT_FILE_NAME)) {
-                    InputStream inputStream = zipInputStream;
-                    inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-                    bufferedReader  = new BufferedReader(inputStreamReader);
-                    String readLine;
-
-                    while ((readLine = bufferedReader.readLine()) != null) {
-                        String[] elements = readLine.split(MGWFileSourceConstants.EVENT_SEPARATOR);
+            ZipEntry zipEntry = zipInputStream.getNextEntry();
+            if (zipEntry.getName().equals(MGWFileSourceConstants.API_USAGE_OUTPUT_FILE_NAME)) {
+                InputStream inputStream = zipInputStream;
+                inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
+                bufferedReader = new BufferedReader(inputStreamReader);
+                String readLine;
+                String streamId, timeStamp, metaData, correlationData, payloadData;
+                String[] elements;
+                long lineNumber = 0;
+                while ((readLine = bufferedReader.readLine()) != null) {
+                    lineNumber++;
+                    try {
+                        elements = readLine.split(MGWFileSourceConstants.EVENT_SEPARATOR);
                         //StreamID
-                        String streamId = elements[0].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
+                        streamId = elements[0].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
                         //Timestamp
-                        String timeStamp = elements[1].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
+                        timeStamp = elements[1].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
                         //MetaData
-                        String metaData = elements[2].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
+                        metaData = elements[2].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
                         //correlationData
-                        String correlationData = elements[3].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
+                        correlationData = elements[3].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
                         //PayloadData
-                        String payloadData = elements[4].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
-
-                        SourceEventListener eventSource = MGWFileSourceRegistrationManager.
-                                getStreamSpecificEventListenerMap().get(streamId);
-                        if (eventSource != null) {
-                                try {
-                                    eventSource.onEvent(
-                                            new Event(streamId, Long.parseLong(timeStamp),
-                                                    (Object[]) FileDataRetrieverUtil.createMetaData(metaData),
-                                                    (Object[]) FileDataRetrieverUtil.createMetaData(correlationData),
-                                                    FileDataRetrieverUtil.createPayload(streamId, payloadData)), null);
-                                } catch (Exception e) {
-                                    log.warn("Error occurred while publishing event : " + Arrays.toString(elements), e);
-                                }
+                        payloadData = elements[4].split(MGWFileSourceConstants.KEY_VALUE_SEPARATOR)[1];
+                    } catch (RuntimeException e) {
+                        log.error("Event format does not match with the expected format in line number : " + lineNumber
+                                + " on file : " + infoDTO);
+                        // skip this line and continue with the next event in the file
+                        continue;
+                    }
+                    SourceEventListener eventSource = MGWFileSourceRegistrationManager.
+                            getStreamSpecificEventListenerMap().get(streamId);
+                    if (eventSource != null) {
+                        try {
+                            eventSource.onEvent(new Event(streamId, Long.parseLong(timeStamp),
+                                    (Object[]) FileDataRetrieverUtil.createMetaData(metaData),
+                                    (Object[]) FileDataRetrieverUtil.createMetaData(correlationData),
+                                    FileDataRetrieverUtil.createPayload(streamId, payloadData)), null);
+                        } catch (NumberFormatException e) {
+                            log.error("Error occurred while executing onEvent for event : " + Arrays.toString(elements),
+                                    e);
                         }
+                    } else {
+                        log.error("Unable to find eventsource for stream id: " + streamId);
                     }
                 }
             }

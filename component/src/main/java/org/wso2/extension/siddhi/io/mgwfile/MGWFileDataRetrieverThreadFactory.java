@@ -19,33 +19,20 @@
 package org.wso2.extension.siddhi.io.mgwfile;
 
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is the Thread Factory used to create the threads which reads the files from the DB and map them to streams
  */
 public class MGWFileDataRetrieverThreadFactory implements ThreadFactory {
 
-    static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
-    final ThreadGroup group;
-    final AtomicInteger threadNumber = new AtomicInteger(1);
-    final String namePrefix;
+    private int counter = 0;
+    private String prefix = "";
 
-    public MGWFileDataRetrieverThreadFactory() {
-        SecurityManager s = System.getSecurityManager();
-        group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        namePrefix = "UsagePublisher-pool-" + POOL_NUMBER.getAndIncrement() + "-thread-";
+    public MGWFileDataRetrieverThreadFactory(String prefix) {
+        this.prefix = prefix;
     }
 
-    @Override
     public Thread newThread(Runnable r) {
-        Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement(), 0);
-        if (t.isDaemon()) {
-            t.setDaemon(false);
-        }
-        if (t.getPriority() != Thread.NORM_PRIORITY) {
-            t.setPriority(Thread.NORM_PRIORITY);
-        }
-        return t;
+        return new Thread(r, prefix + "-" + counter++);
     }
 }

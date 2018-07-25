@@ -22,6 +22,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
 import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
@@ -49,14 +50,14 @@ public class FileDataRetrieverUtil {
     }
 
 
-    public static Object createMetaData(String str) throws Exception {
+    public static Object createMetaData(String str) {
         if (str.isEmpty() || "null".equals(str)) {
             return null;
         }
         return new Object[]{str};
     }
 
-    public static Object[] createPayload(String streamId, String str) throws Exception {
+    public static Object[] createPayload(String streamId, String str) throws NumberFormatException {
 
         JSONArray jsonArray = streamDefinitions.get(streamId);
         if (jsonArray != null) {
@@ -64,28 +65,28 @@ public class FileDataRetrieverUtil {
             Object[] objects = new Object[strings.length];
             for (int i = 0; i < strings.length; i++) {
                 JSONObject obj = (JSONObject) jsonArray.get(i);
-                objects[i] = getPayloadObject((String) obj.get("type"), strings[i].trim());
+                objects[i] = getPayloadObject(AttributeType.valueOf(obj.get("type").toString()), strings[i].trim());
             }
             return objects;
         }
         return new Object[0];
     }
 
-    public static Object getPayloadObject(String type, String string) throws Exception {
+    public static Object getPayloadObject(AttributeType type, String string) throws NumberFormatException {
         if (string == null || string.isEmpty()) {
             return null;
         }
         switch (type) {
-            case "STRING":
-                return string;
-            case "INT":
-                return Integer.parseInt(string);
-            case "LONG":
-                return Long.parseLong(string);
-            case "BOOL":
-                return Boolean.parseBoolean(string);
-            default:
-                return string;
+        case STRING:
+            return string;
+        case INT:
+            return Integer.parseInt(string);
+        case LONG:
+            return Long.parseLong(string);
+        case BOOL:
+            return Boolean.parseBoolean(string);
+        default:
+            return string;
         }
     }
 

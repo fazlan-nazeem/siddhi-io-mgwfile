@@ -20,7 +20,7 @@ package org.wso2.extension.siddhi.io.mgwfile.task;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceConstants;
+import org.wso2.extension.siddhi.io.mgwfile.MGWFileSourceDS;
 import org.wso2.extension.siddhi.io.mgwfile.dao.MGWFileSourceDAO;
 import org.wso2.extension.siddhi.io.mgwfile.exception.MGWFileSourceException;
 
@@ -56,19 +56,14 @@ public class MGWFileCleanUpTask extends TimerTask {
     @Override
     public void run() {
         log.debug("UploadUsage Cleaning task started");
-        String fileRetentionDays = System.getProperty(MGWFileSourceConstants.FILE_RETENTION_DAYS);
-        if (fileRetentionDays != null && !fileRetentionDays.isEmpty()) {
-            Date lastKeptDate = getLastKeptDate(Integer.parseInt(fileRetentionDays));
-            log.info("Uploaded API Usage data in the db will be cleaned up to : " + dateFormat.format(lastKeptDate));
-            try {
-                MGWFileSourceDAO.deleteProcessedOldFiles(lastKeptDate);
-            } catch (MGWFileSourceException e) {
-                log.error("Error occurred while cleaning the uploaded usage data.", e);
-            }
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Uploaded usage cleanup is not enabled.");
-            }
+        String fileRetentionDays = MGWFileSourceDS.getFileRetentionDays();
+        Date lastKeptDate = getLastKeptDate(Integer.parseInt(fileRetentionDays));
+        log.info("Uploaded API Usage data in the db will be cleaned up to : " + dateFormat.format(lastKeptDate));
+        try {
+            MGWFileSourceDAO.deleteProcessedOldFiles(lastKeptDate);
+        } catch (MGWFileSourceException e) {
+            log.error("Error occurred while cleaning the uploaded usage data.", e);
         }
     }
+
 }
