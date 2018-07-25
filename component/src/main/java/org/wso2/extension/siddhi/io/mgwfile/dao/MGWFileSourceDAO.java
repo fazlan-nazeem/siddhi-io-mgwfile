@@ -61,8 +61,8 @@ public class MGWFileSourceDAO {
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(MGWFileSourceConstants.INSERT_UPLOADED_FILE_INFO_QUERY);
             statement.setString(1, dto.getFileName());
-            statement.setTimestamp(3, new Timestamp(dto.getTimeStamp()));
-            statement.setBinaryStream(4, uploadedInputStream);
+            statement.setTimestamp(2, new Timestamp(dto.getTimeStamp()));
+            statement.setBinaryStream(3, uploadedInputStream);
             statement.executeUpdate();
             connection.commit();
             if (log.isDebugEnabled()) {
